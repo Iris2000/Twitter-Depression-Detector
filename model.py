@@ -11,7 +11,6 @@ import pickle
 import numpy as np
 import nltk
 import gsdmm
-import keras
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
@@ -19,18 +18,11 @@ from nltk.tokenize import word_tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nrclex import NRCLex
 from collections import Counter
-from gsdmm import MovieGroupProcess
-from gensim.models.phrases import Phraser, Phrases
-from keras.models import load_model
+from keras.models import model_from_json
 from sentence_transformers import SentenceTransformer
+from flask import Flask, request, jsonify, render_template
 
-# import normal csv
-normal_df = pd.read_csv (r'C://Users//lvlip//Documents//BCSI Sem 6//FYP 4202//CSV//normal_twint//NormalCombine.csv', engine='python')
-# import depressed csv
-depressed_df = pd.read_csv (r'C://Users//lvlip//Documents//BCSI Sem 6//FYP 4202//CSV//depression_twint//DepressedCombine.csv', engine='python')
-# combine two dataframe
-df = pd.concat([normal_df, depressed_df], axis=0)
-df.head()
+app = Flask(__name__)
 
 # extract required columns
 def extract(df):
@@ -301,6 +293,10 @@ def nrclex(df):
     df['emotions'] = df['cleaned_tweet'].apply(lambda x: NRCLex(x).affect_frequencies)
     # split emotions into respective columns
     df = pd.concat([df.drop(['emotions'], axis=1), df['emotions'].apply(pd.Series)], axis=1)
+    # remove extra column
+    df = df.drop('anticip', 1)
+    # replace NaN with 0
+    df['anticipation'] = df['anticipation'].fillna(0)
     return df
 
 # get liwc with custom dictionary
@@ -338,6 +334,16 @@ def count_liwc(df):
     
     # concat df with liwc
     df = pd.concat([df, liwc_df], axis=1)
+
+    # all liwc column
+    columns = ['second/thirdperson', 'firstperson', 'sadness/loneliness', 'suicidal', 'primarysupport',
+              'troubleconcentrate', 'worthlessness/guilt', 'housing', 'disturbedsleep', 'occupational',
+              'fatigue/lossenergy', 'weight/appetite', 'agitation/retardation']
+    
+    for column in columns:
+        if column not in df:
+            df[column] = 0
+
     return df
 
 # topic modeling
@@ -362,14 +368,6 @@ def train_topic(df):
     # find the length of dictionary
     dic_length = len(dictionary)
     
-    # create bow dictionary for calculating topic coherence later on
-    bow_corpus = [dictionary.doc2bow(doc) for doc in docs_cleaned]
-    
-    # build bi-grams
-    bigram = Phrases(docs_cleaned, min_count=2, threshold=5) 
-    bigram_model = Phraser(bigram)
-    bigrams_text = [bigram_model[word] for word in docs_cleaned]
-
     # initialize GSDMM
     with open('gsdmm.pkl', 'rb') as topic:
         gsdmm = pickle.load(topic)
@@ -401,16 +399,23 @@ def predict(predict_df):
     # build bert model with distilbert - ligther version of bert
     bert_model = SentenceTransformer('distilbert-base-nli-mean-tokens')
     # create embeddings with bert - with 'cleaned_tweet' only
-    embeddings = bert_model.encode(predict_df['cleaned_tweet'], show_progress_bar=True)
+    embeddings = bert_model.encode(predict_df['cleaned_tweet'])
     # combine embeddings and other features
-    embeddings2 = np.hstack((embeddings, predict_df[predict_df.columns.difference(['cleaned_tweet'])]))
+    embeddings2 = np.hstack((embeddings, 
+                             predict_df[predict_df.columns.difference(['username', 'datetime',
+                                                                       'tweet', 'cleaned_tweet'])]))
     # define row and column number
     row_num = embeddings2.shape[0]
     col_num = embeddings2.shape[1]
     # reshape to 3 dimension for prediction
     predict_data = embeddings2.reshape(row_num, col_num, 1)
     # loading the model
-    model = load_model("neural_network2.hdf5")
+    json_file = open('model.json', 'r')
+    loaded_model_json = json_file.read()
+    json_file.close()
+    model = model_from_json(loaded_model_json)
+    # loading the best model
+    model.load_weights('neural_network2.hdf5')
     # predict the target
     score = model.predict(predict_data)
     # encode score into target
@@ -420,36 +425,49 @@ def predict(predict_df):
     predicted_df = pd.concat([predict_df, label_df], axis=1)
     return predicted_df
 
-df = extract(df)
-df = duplicate(df)
-df = decode(df)
-tweet = tweet_list(df)
-tweet = clean(tweet)
-tweet = emojis(tweet)
-tweet = lowercase(tweet)
-tweet = contracts(tweet)
-tweet = punctuations(tweet)
-tweet = lengthening(tweet)
-tweet = jargons(tweet)
-tweet = numbers(tweet)
-tweet = replace(tweet)
-tweet = whitespace(tweet)
-# extract pos tag
-pos_tagged = [nltk.pos_tag(nltk.word_tokenize(x)) for x in tweet]
-# replace the original pos tag with simpler naming
-wordnet_tagged = [list(map(lambda x: (x[0], pos_tagger(x[1])), x)) for x in pos_tagged]
-tweet = lemmatize(wordnet_tagged)
-tweet = remove_stopwords(tweet)
-tweet = lowercase(tweet)
-df = combine(tweet, df)
-df = less_words(df)
-df = vader(df)
-df = nrclex(df)
-df = count_liwc(df)
-gsdmm, docs_cleaned = train_topic(df)
-# number of documents per topic
-doc_count = np.array(gsdmm.cluster_doc_count)
-# topics sorted by the number of document they are allocated to
-top_topic = doc_count.argsort()[-10:][::-1]
-df = extract_topic(df, gsdmm, docs_cleaned, top_topic)
-predicted_df = predict(df)
+@app.route('/')
+def home():
+    return render_template('dashboard.py')
+
+@app.route('/predict2',methods=['POST'])
+def predict2():
+
+    # import csv
+    df = pd.read_csv (r'C://Users//lvlip//Documents//BCSI Sem 6//FYP 4202//CSV//testing.csv', engine='python')
+    df = extract(df)
+    df = duplicate(df)
+    df = decode(df)
+    tweet = tweet_list(df)
+    tweet = clean(tweet)
+    tweet = emojis(tweet)
+    tweet = lowercase(tweet)
+    tweet = contracts(tweet)
+    tweet = punctuations(tweet)
+    tweet = lengthening(tweet)
+    tweet = jargons(tweet)
+    tweet = numbers(tweet)
+    tweet = replace(tweet)
+    tweet = whitespace(tweet)
+    # extract pos tag
+    pos_tagged = [nltk.pos_tag(nltk.word_tokenize(x)) for x in tweet]
+    # replace the original pos tag with simpler naming
+    wordnet_tagged = [list(map(lambda x: (x[0], pos_tagger(x[1])), x)) for x in pos_tagged]
+    tweet = lemmatize(wordnet_tagged)
+    tweet = remove_stopwords(tweet)
+    tweet = lowercase(tweet)
+    df = combine(tweet, df)
+    df = less_words(df)
+    df = vader(df)
+    df = nrclex(df)
+    df = count_liwc(df)
+    gsdmm, docs_cleaned = train_topic(df)
+    # number of documents per topic
+    doc_count = np.array(gsdmm.cluster_doc_count)
+    # topics sorted by the number of document they are allocated to
+    top_topic = doc_count.argsort()[-10:][::-1]
+    df = extract_topic(df, gsdmm, docs_cleaned, top_topic)
+    predicted_df = predict(df)
+    return render_template('index.html', prediction_text=predicted_df.to_html())
+
+if __name__ == "__main__":
+    app.run(debug=True)
