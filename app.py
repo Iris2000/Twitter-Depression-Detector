@@ -14,7 +14,6 @@ from flask import flash
 # manage db and users
 import sqlite3
 from sqlalchemy import Table, create_engine
-from sqlalchemy import event
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, logout_user, current_user, UserMixin
 from flask_admin import Admin
