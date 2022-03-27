@@ -17,14 +17,13 @@
 
      <!-- Main Input For Receiving Query to our ML -->
     <form action="{{ url_for('predict2') }}"method="post">
-
 		<!--<input type="text" name="tweet" placeholder="tweet" required="required" />-->
         <button type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
     </form>
 
    <br>
    <br>
-   <!-- {{ prediction_text | safe }} -->
+   {{ prediction_text | safe }}
 
  </div>
 </body>

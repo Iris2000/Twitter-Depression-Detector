@@ -1,0 +1,96 @@
+.DateInput_input, .DateInput_input_1 {
+    text-align: center;
+    font-size: inherit !important;
+    Height: 35px !important;
+    Width: 100% !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+}
+
+#date .DateInput {
+    background: transparent;
+}
+
+#date .DateInput_input {
+    background-color: transparent;
+}
+
+#patient-appt .dash-dropdown {
+    border: none !important;
+}
+
+#date .SingleDatePickerInput__withBorder {
+    border: none;
+    margin-bottom: -0.3rem;
+    margin-left: -1.5rem;
+    background: none;
+}
+
+#patient, #public {
+    font-family: 'Source Serif Pro';
+    border-width: 1.5px;
+    border-radius: 5px;
+    background: white;
+    padding: 10px;
+    padding-bottom: 0;
+}
+
+#patient:focus, #public:focus {
+    box-shadow: 3px 3px #e79070;
+}
+
+.btn {
+    font-family: 'Source Serif Pro';
+    color: white;
+    background-color: #e79070;
+    border: none;
+}
+
+.btn:hover, .btn:active, .btn:focus {
+    background-color: #e17751;
+}
+
+.previous {
+    text-decoration: none;
+    padding: 5px 10px;
+    float: left;
+    margin-left: 1rem;
+    margin-top: 2rem;
+    background-color: #e79070;
+    color: white;
+}
+
+.previous:hover {
+    background-color: #e17751;
+    color: white;
+}
+
+.round {
+    border-radius: 50%;
+}
+
+.form-control {
+    margin-top: 0.5rem;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #e17751;
+    font-family: 'Source Serif Pro';
+    color: #7f4245;
+}
+
+.link {
+    color: #7f4245;
+}
+
+.link:hover {
+    color: #7f4245;
+    font-weight: 500;
+}
+
+#patient-appt .Select-control {
+    border: none;
+    border-bottom: 1px solid #e17751;
+    margin-bottom: 1.5rem;
+    font-family: none;
+    color: #484848;
+}
