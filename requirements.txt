@@ -145,13 +145,13 @@ termcolor==1.1.0
 textblob==0.17.1
 textsearch==0.0.21
 tf-estimator-nightly==2.8.0.dev2021122109
-tokenizers==0.10.3
+tokenizers==0.11.6
 tomli==1.2.3
 torch==1.11.0
 tornado==6.1
 tqdm==4.62.3
 traitlets==5.1.1
-transformers==4.15.0
+transformers==4.17.0
 tweepy==4.5.0
 twint @ git+https://github.com/twintproject/twint.git@e7c8a0c764f6879188e5c21e25fb6f1f856a7221
 typing_extensions==4.0.1
