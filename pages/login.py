@@ -2,7 +2,6 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, Input, Output, State, callback
 from dash.exceptions import PreventUpdate
 from flask_login import login_user
-# password hashing
 from werkzeug.security import check_password_hash
 
 layout = html.Div([

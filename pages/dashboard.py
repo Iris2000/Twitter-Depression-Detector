@@ -1,5 +1,4 @@
 # import packages
-from flask import session
 import pandas as pd
 import re 
 import unidecode
@@ -14,6 +13,7 @@ import nltk
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import twint
+import base64
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet
 from nltk.corpus import stopwords
@@ -23,13 +23,12 @@ from nrclex import NRCLex
 from collections import Counter
 from keras.models import model_from_json
 from sentence_transformers import SentenceTransformer
+from wordcloud import WordCloud
+from io import BytesIO
 from dash import html, dcc, Input, Output, State, callback, dash_table, no_update
+from dash.exceptions import PreventUpdate
 from flask_login import current_user
 from datetime import date, datetime
-from dash.exceptions import PreventUpdate
-from io import BytesIO
-from wordcloud import WordCloud
-import base64
 
 layout = dbc.Spinner(
     html.Div([
@@ -151,20 +150,20 @@ def clear_session(n_clicks, pathname):
     Output('select-alert', 'children'),
     Output('select-alert', 'style'),
     Input('analyze', 'n_clicks'),
+    Input('analyze', 'value'),
     State('patient-name', 'value'),
     State('start-date', 'date'),
-    State('end-date', 'date'),
-    State('analyze', 'value')
+    State('end-date', 'date')
 )
 
-def required_field(n_clicks, name, start, end, value):
+def required_field(n_clicks, value, name, start, end):
     if n_clicks > 0:
         if name == None or start == None or end == None:
             alert = dbc.Alert('Please complete the form before proceeding.', 
                                 color='warning', dismissable=True, style={'margin-top':'1rem'})
             alert_style = {'display':'block'}
         elif end < start:
-            alert = dbc.Alert('Ending date should not be earlier than starting date.', 
+            alert = dbc.Alert('End date should not be earlier than the start date.', 
                     color='warning', dismissable=True, style={'margin-top':'1rem'})
             alert_style = {'display':'block'}
         elif value == 1:
@@ -199,15 +198,18 @@ def required_field(n_clicks, name, start, end, value):
 )
 
 def update_output(n_clicks, name, start_date, end_date, session_data):
-    if session_data is not None:
-        if current_user.username != session_data['username']:
-            session_data.clear()
+    if n_clicks == 0:
+        if session_data is not None:
+            if current_user.username != session_data['username']:
+                session_data.clear()
+                raise PreventUpdate
+            else:         
+                return (session_data['table_style'], session_data['table_data'], session_data['table_columns'], 
+                        session_data['score'], session_data['graph_style'], session_data['graph_figure'], 
+                        session_data['pos_word'], session_data['neg_word'], session_data['alert'], 
+                        session_data['alert_style'], session_data, 0, no_update)
+        else:
             raise PreventUpdate
-        else:         
-            return (session_data['table_style'], session_data['table_data'], session_data['table_columns'], 
-                    session_data['score'], session_data['graph_style'], session_data['graph_figure'], 
-                    session_data['pos_word'], session_data['neg_word'], session_data['alert'], 
-                    session_data['alert_style'], session_data, 0, no_update)
     elif n_clicks > 0:
         if name != None and start_date != None and end_date != None:
             # scrape tweets
@@ -216,7 +218,6 @@ def update_output(n_clicks, name, start_date, end_date, session_data):
             if df.empty:
                 return (no_update, no_update, no_update, no_update, no_update, no_update, 
                         no_update, no_update, no_update, no_update, no_update, 1, no_update)
-                # raise PreventUpdate
             # import csv
             df = extract(df)
             df = duplicate(df)
@@ -912,7 +913,7 @@ def update_dropdown(option):
         from app import Patient
         patient = Patient.query.filter_by(doctorID=current_user.userID).all()
         dropdown = [
-            {'label': i.fullname, 'value': i.twitter} for i in patient
+            {'label': i.fullname, 'value': i.twitter} for i in patient if i.twitter != ''
         ]
         return dropdown
     raise PreventUpdate

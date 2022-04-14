@@ -1,6 +1,5 @@
 import pandas as pd 
 import sqlalchemy as db
-import time
 import dash_bootstrap_components as dbc
 from dash import dcc, html, Input, Output, State, callback, dash_table
 from flask_login import current_user
@@ -407,7 +406,6 @@ def show_modal(add_clicks, confirm_clicks, id, date, time, remark):
 
 def required_field(n_clicks, name, date, time):
     if n_clicks > 0:
-        # return name_border, date_border, True
         if name == None or date == None or time == None:
             alert = dbc.Alert('Please complete the form before proceeding.', 
                                 color='warning', dismissable=True, style={'margin-top':'0.5rem'})

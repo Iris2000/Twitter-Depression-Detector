@@ -1,9 +1,7 @@
-from ast import If
-import dash_bootstrap_components as dbc
 import re
+import dash_bootstrap_components as dbc
 from dash import dcc, html, Input, Output, State, callback
 from dash.exceptions import PreventUpdate
-# password hashing
 from werkzeug.security import generate_password_hash
 
 layout = dbc.Row([
