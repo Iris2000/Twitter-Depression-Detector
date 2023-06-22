@@ -15,7 +15,7 @@ The underlying motivation behind this project was to address the growing concern
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [System Architecture](#system_architecture)
+- [System Architecture](#system-architecture)
 
 ## Installation
 
@@ -34,7 +34,9 @@ python app.py
 
 ## System Architecture
 
-![System Architecture](./docs/System Architecture.png)
+![System Architecture](https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/System%20Architecture.png?raw=true)
+
+The data mining steps were uploaded to /Data Analysis folder for easier exploration using Jupyter Notebook.
 
 ## Features
 
