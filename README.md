@@ -21,7 +21,8 @@ The underlying motivation behind this project was to address the growing concern
 - [Data Preprocessing](#data-preprocessing)
 - [Feature Engineering](#feature-engineering)
 - [Final Dataset](#final-dataset)
-- [Exploratory Data Analysis](#exploratory-data-analysis)
+- [Classification Model](#classification-model)
+- [System Diagrams](#system-diagrams)
 
 ## Installation
 
@@ -118,7 +119,52 @@ GSDMM is a modified version of Latent Dirichlet Allocation (LDA) short text clus
 <img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Final%20Dataset1.png" width="700">
 <img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Final%20Dataset2.png" width="700">
 
-## Exploratory Data Analysis
+## Classification Model
+
+#### Machine Learning Models
+
+* Logistc Regression (LR)
+* Support Vector Machine (SVM)
+* Random Forest (RF)
+* Neural Network (NN)
+
+#### Word Embeddings
+
+* Term Frequency-Inverse Document Frequency (TF-IDF)
+* Word2Vec
+* Bidirectional Encoder Representations from Transformers (BERT)
+
+#### Training Input
+
+* Cleaned tweets only
+* All features
+
+#### Combinations
+
+A total of 8 models were constructed using various combinations of machine learning models, word embeddings techniques, and training inputs. The performance of each model was evaluated using 10-fold cross-validation to calculate the mean performance. To generate training samples, the dataset was shuffled, and a selection of 5000 samples from both normal and depressed tweets was made. From these samples, four columns containing username, datetime, original tweet, and target were excluded. The resulting sample was split into 80% training data and 20% testing data respectively for model training and evaluation.
+
+* LR with TF-IDF (tweets only)
+* LR with TF-IDF (tweets + feature extracted from feature engineering)
+
+* SVM with TF-IDF (all features)
+* RF with TF-IDF (all features)
+
+* SVM with Word2Vec (tweets only)
+* SVM with Word2Vec (all features)
+
+* NN with BERT (tweets only)
+* NN with BERT (all features) 93.90%
+
+#### Model Evaluation
+
+The results of the study indicate that including all linguistic features in the training process yields better performance compared to using only tweets. When comparing the performance of three machine learning models using the same embeddings and features, SVM exhibited the highest performance, while RF had the lowest performance. RF was found to be the least efficient model in terms of training time. To improve the SVM model's performance, it was retrained using a more complex word embedding technique, Word2Vec, which resulted in further improvement. Additionally, the neural network model demonstrated the highest accuracy, achieving a score of 93.90%, indicating its effectiveness in enhancing performance.
+
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Model%20Evaluation.png" width="500">
+
+## System Diagrams
+
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Use%20Case%20Diagram.png" width="500">
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Activity%20Diagram.png" width="500">
 
 ## Features
 
