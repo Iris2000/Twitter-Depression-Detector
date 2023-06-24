@@ -20,6 +20,8 @@ The underlying motivation behind this project was to address the growing concern
 - [Data Screening](#data-screening)
 - [Data Preprocessing](#data-preprocessing)
 - [Feature Engineering](#feature-engineering)
+- [Final Dataset](#final-dataset)
+- [Exploratory Data Analysis](#exploratory-data-analysis)
 
 ## Installation
 
@@ -106,6 +108,17 @@ LIWC is a text analysis program that counts words in over 80 categories with psy
 <img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Custom%20LIWC.png" height="300">
 
 The inclusion of the first two categories of personal pronouns was based on the observation that depressed people tend to use first person pronouns, while non-depressed people tend to use second or third person pronouns. Categories 3 to 9 and 13 represent depressive symptoms, and categories 10 to 12 represent psychological stressors. Psychological stressors refer to the social and physical environmental circumstances that affect one’s mental health. The dictionary contains only 142 words as it was manually compiled from a limited number of papers and resources on this topic.
+
+#### Gibbs Sampling Dirichlet Multinomial Mixture (GSDMM)
+
+GSDMM is a modified version of Latent Dirichlet Allocation (LDA) short text clustering model. It is specifically designed to be more effective in detecting topics within shorter texts, such as tweets. The GSDMM model was initialized with parameters K=10, alpha=0.1, beta=0.1, and n_iter=30. Tweets are assigned a specific topic only if the threshold equals or higher than 0.3. Otherwise, the tweet is assigned to topic 10, indicating another topic.
+
+## Final Dataset
+
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Final%20Dataset1.png" width="700">
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Final%20Dataset2.png" width="700">
+
+## Exploratory Data Analysis
 
 ## Features
 
