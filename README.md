@@ -38,43 +38,43 @@ python app.py
 
 ## System Architecture
 
-![System Architecture](https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/System%20Architecture.png?raw=true)
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/System%20Architecture.png?raw=true" width="500">
 
 The data mining steps were uploaded to /Data Analysis folder for easier exploration using Jupyter Notebook.
 
 ## Data Collection
 
-The dataset was collected using Twint, an advanced Twitter scraper that scrapes tweets without using Twitter’s API. Two datasets were required, a normal (non-depressed) dataset and a depressed dataset.
+The dataset was collected using Twint, an advanced Twitter scraper that retrieves tweets without using Twitter’s API. Two datasets were required, a normal (non-depressed) dataset and a depressed dataset.
 
 #### Normal Dataset (Non-Depressed)
 
-The normal dataset was collected in 4 batches of one day each from 16th to 18th December 2021, and 31st December 2021. 3000 tweets are collected per day, only 1000 tweets on the last day. It has 10,000 tweets in total. The dataset was collected from different days to avoid similar topics discussed on the same day, and to augment the normal dataset with topics diversity.
+The normal dataset was collected in 4 batches, each spanning a single day, from 16th to 18th December 2021, and on 31st December 2021. A total of 3000 tweets were collected per day, except for the last day when only 1000 tweets were collected. In total, the dataset comprised 10,000 tweets. Collecting the dataset on different days aimed to avoid similar topics being discussed on the same day and to enhance the diversity of topics within the normal dataset.
 
 #### Depressed Dataset
 
-A range of keywords were chosen to target depressive tweets, including different hashtags related to depression, such as “depressed”, “depression”, “anxiety”, “bipolar”, “DepressionIsReal”, and more. Depressed candidates were manually selected from the dataset collected using these hashtags. Their profiles were scrutinized to make sure they showed depressive tendencies such as suicidal, loneliness, and self-hatred.
+Various keywords were selected to target depressive tweets, including different hashtags related to depression, such as “depressed”, “depression”, “anxiety”, “bipolar”, “DepressionIsReal”, and more. Depressed candidates were manually selected from the dataset gathered using these hashtags. Their profiles were scrutinized to ensure they exhibited depressive tendencies, such as expressing thoughts of suicide, loneliness, and self-hatred.
 
 ## Data Screening
 
-In this step, irrelevant tweets from the dataset were manually removed using different rules listed below. When done, an additional column called “target” was added to each dataset. The “target” column in the normal dataset was set to “normal”, while the depressed dataset was set to “depressed”.
+In this step, irrelevant tweets were manually removed using the following predefined rules. Once this process was completed, an additional column named “target” was assigned the value “normal”, while in the depressed dataset, it was assigned the value “depressed”.
 
 #### Normal Dataset
 
 *	Remove non-English tweets. 
-*	Remove tweets with duplicate topics, such as NFTs, giveaways, and birthday wishes.
-*	Remove tweets with commercial purposes, typically from business accounts.
-*	Remove tweets that share songs, which usually contain only the song title and an external link direct to the song.
-*	Remove tweets with depressive tendencies.
+*	Remove tweets discussing duplicate topics, such as NFTs, giveaways, and birthday wishes.
+*	Remove tweets with commercial intent, often originating from business accounts.
+*	Remove tweets sharing songs, which usually consisted of the song title and an external link.
+*	Remove tweets displaying depressive tendencies.
 
 #### Depressed Dataset
 
 *	Remove non-English tweets.
-*	Remove tweets with motivational purposes.
-*	Remove tweets without depressive tendencies.
+*	Remove tweets with motivational content.
+*	Remove tweets without any depressive tendencies.
 
 ## Data Preprocessing
 
-Data preprocessing was done on the tweet column. The processed tweet column was then combined to the dataset so that it has both the original and cleaned tweets. 
+The tweet column was preprocessed to clean and prepare the data for analysis. The processed tweets were then added back to the dataset, allowing for easy comparison and analysis alongside the original tweets.
 
 *	Extract 4 required columns, including datetime, username, tweet, and target.
 *	Remove duplicate tweets, non-English characters, and stop words.
@@ -87,14 +87,25 @@ Data preprocessing was done on the tweet column. The processed tweet column was 
   
 ## Feature Engineering
 
-4 techniques were applied to extract useful linguistic features that are capable of describing and distinguishing depressive and non-depressive tweets. After feature engineering, the dataset has a total of 10547 rows and 30 columns. 
+4 techniques were applied to extract useful linguistic features that can effectively describe and differentiate depressive and non-depressive tweets. After feature engineering process, the dataset now consists of 10547 rows and 30 columns. 
 
 #### Valence Aware Dictionary & sEntiment Reasoner (VADER)
 
-VADER can detect sentiment polarity within a text, as either positive, neutral, or negative. It also tells intensity of emotion by considering capitalization and punctuation. The original tweets were chosen to apply VADER rather than cleaned tweets because original tweets retain the intensity of emotion. Only "compound" was returned because it represents the summary of the score.
+VADER is capable of detecting sentiment polarity (positive, neutral, or negative) within a text. It also tells the intensity of emotion by considering capitalization and punctuation. The original tweets were selected for applying VADER instead of the cleaned tweets as they preserve the intensity of emotion. Only the "compound" score was used as it provides a summary of the sentiment.
 
 #### National Research Council Canada Affect Lexicon (NRCLex)
 
+NRCLex can extract 10 emotional affects behind the text, including fear, anger, anticipation, trust, surprise, positive, negative, sadness, disgust, and joy. Since NRCLex requires text cleaning to ensure accurate analysis, thus the cleaned tweets were chosen as input for calculating the emotion lexicon.
+
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/NRCLex.png" width="500">
+
+#### Linguistic Inquiry and Word Count (LIWC)
+
+LIWC is a text analysis program that counts words in over 80 categories with psychologically meaning. The dictionary plays an crucial role in the LIWC program as it specifies which words should be included in the analysis. For this project, a customized version of the dictionary was created, taking inspiration from the original dictionary, to identify depressive symptoms within tweets. The full dictionary used can be accessed from Data Analysis/liwc_custom.xlsx.
+
+<img src="https://github.com/Iris2000/Twitter-Depression-Detector/blob/master/docs/Custom%20LIWC.png" height="300">
+
+The inclusion of the first two categories of personal pronouns was based on the observation that depressed people tend to use first person pronouns, while non-depressed people tend to use second or third person pronouns. Categories 3 to 9 and 13 represent depressive symptoms, and categories 10 to 12 represent psychological stressors. Psychological stressors refer to the social and physical environmental circumstances that affect one’s mental health. The dictionary contains only 142 words as it was manually compiled from a limited number of papers and resources on this topic.
 
 ## Features
 
